@@ -1,0 +1,35 @@
+{
+  "name": "zendesk-node-codetest",
+  "version": "1.0.0",
+  "description": "This is a code challenge used for handling a large number of requests",
+  "main": "./index.js",
+  "scripts": {
+    "start": "node ./index.js",
+    "lint": "eslint .",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MagickLizard/zendesk-nodejs-project.git"
+  },
+  "keywords": [
+    "code-challenge"
+  ],
+  "author": "Lizzie King",
+  "bugs": {
+    "url": "https://github.com/MagickLizard/zendesk-nodejs-project/issues"
+  },
+  "homepage": "https://github.com/MagickLizard/zendesk-nodejs-project#readme",
+  "devDependencies": {
+    "eslint": "^5.16.0"
+  },
+  "dependencies": {
+    "chai": "^4.2.0",
+    "chalk": "^2.4.2",
+    "commander": "^2.20.0",
+    "eslint": "^5.16.0",
+    "figlet": "^1.2.3",
+    "inquirer": "^6.3.1",
+    "ora": "^3.4.0"
+  }
+}
