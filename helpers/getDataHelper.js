@@ -9,8 +9,6 @@ class GetDataHelper {
     console.log("get all>>>", term);
     let checkResult = filterByValue(Organisations, term);
     console.log(">checkResult>>", checkResult);
-    // let flatten = this.flattenOrganisationData(Organisations);
-    // console.log("flatten>>>", flatten);
   }
 
   flattenOrganisationData(Organisations) {
@@ -53,9 +51,7 @@ function filterByValue(array, string) {
           }
         });
       }
-      //  else {
-      //   o[k].includes(string);
-      // }
+
     });
   });
 }
