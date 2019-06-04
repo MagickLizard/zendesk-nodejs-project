@@ -6,65 +6,89 @@ class GetDataHelper {
   constructor() {}
 
   getAll(term) {
-    console.log("get all>>>", term);
+    // console.log("get all>>>", term);
     let checkResult = filterByValue(Organisations, term);
     console.log(">checkResult>>", checkResult);
   }
 
-  flattenOrganisationData(Organisations) {
-    return Organisations.map(k => {
-      let nested = Object.values(k).map(values => {
-        if (Array.isArray(values)) {
-          let nestedCheck = arrayToObject(values);
-          console.log("nestedCheck>>>", nestedCheck);
-          return nestedCheck;
-        } else {
-          return values;
-        }
-      });
-      return nested;
-    });
-  }
 }
-function filterByValue(array, string) {
-  return array.filter(o => {
-    return Object.keys(o).some(k => {
-      // console.log("o[k]>>>", typeof o[k], o[k]);
-      if (typeof o[k] === "string") {
-        if (o[k].toLowerCase().includes(string.toLowerCase())) {
-          console.log("o[k]>>>", o[k]);
-          return o[k];
-        }
-      } else if (typeof o[k] === "object") {
-        let nestedCheck = arrayToObject(o[k]);
-        return Object.keys(nestedCheck).some(k => {
-          // console.log("kkk>>>", nestedCheck[k]);
-          if (typeof nestedCheck[k] === "string") {
-            if (nestedCheck[k].toLowerCase().includes(string.toLowerCase())) {
-              console.log("nestedCheck[k]", nestedCheck[k]);
-              // return o[k];
-              return nestedCheck[k];
-            } else {
-              console.log("doesnt have value>>>", nestedCheck[k]);
-              return [];
-            }
+function filterByValue(array, searchTerm) {
+  let arrayWithResults = [];
+  array.filter(o => {
+    //TODO: MAKE A FILTER FOR STRING AND OBJECT
+    return Object.keys(o).some(key => {
+      let values = checkTypeOfItem(o[key]);
+      if (values) {
+        if (typeof values === "string") {
+          let checkedTopValue = checkValueIncludesTerm(values, searchTerm, o); //CANNOT SUPPORT HTTP://
+          if (checkedTopValue) {
+            arrayWithResults.push(checkedTopValue);
           }
-        });
+        }
+        if (typeof values === "object") {
+          return Object.keys(values).some(key => {
+            if (typeof values[key] === "string") {
+              let nestedResult = checkValueIncludesTerm(
+                values[key],
+                searchTerm,
+                o
+              );
+              if (nestedResult) {
+                arrayWithResults.push(nestedResult);
+              }
+            }
+          });
+        }
       }
-
     });
   });
+  return arrayWithResults;
+}
+function iterateOverNestedValues(values, searchTerm, parentObject) {
+  return Object.keys(values).some(key => {
+    if (typeof values[key] === "string") {
+      let nestedResult = checkValueIncludesTerm(
+        values[key],
+        searchTerm,
+        parentObject
+      );
+      if (nestedResult) {
+        console.log("nestedResult>>>", typeof nestedResult, nestedResult);
+        return nestedResult;
+      }
+      return values;
+    }
+  });
+  //  const allDataArray = Object.keys(nestedObject).filter((i) => (typeof nestedObject[i] === "string", nestedObject))
+  //  console.log('>allDataArray111>>', allDataArray)
+}
+function checkTypeOfItem(value) {
+  try {
+    if (typeof value === "string") {
+      return value;
+    } else if (typeof value === "object") {
+      return arrayToObject(value);
+    } else if (typeof value === "number") {
+      return value.toString();
+    } else {
+      return value;
+    }
+  } catch (Error) {
+    console.log("Error>>>", Error);
+    return Error;
+  }
+}
+
+function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
+  if (valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
+    return parentObject;
+  } 
+  // else {
+  //   console.log("in here>>>", valueInArray); //TODO MIGHT NEED TO ADD SOMETHING HERE
+  // }
 }
 function arrayToObject(array) {
   return Object.assign({}, array);
-}
-
-function flattenDeep(arr1) {
-  return arr1.reduce(
-    (acc, val) =>
-      Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val),
-    []
-  );
 }
 
 module.exports = GetDataHelper;
