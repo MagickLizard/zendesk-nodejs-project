@@ -5,49 +5,31 @@ const Users = require("../api/users.json");
 class GetDataHelper {
   constructor() {}
 
-  getAll(term, filterByTerm) {
+  getAll(term, filterByTerm, arrayKeyEntered) {
     const organisations = filterByValue(Organisations, term);
     const tickets = filterByValue(Tickets, term);
     const users = filterByValue(Users, term);
-    const finalResult = this.resultBasedOnFilter(organisations, tickets, users, filterByTerm, term);
-    return finalResult;
-  }
-  resultBasedOnFilter(organisationsResults, TicketsResults, UsersResults, filterByTerm, term) {
-    console.log('filterByTerm>>>', filterByTerm)
-    console.log('>searchTerm>>', term)
-    
-    
-    let values = (filterByTerm).map((k) => {
-      console.log('k>>>', typeof k)
-      
-      if (k === 'all') {
-        let arrayOfEverything = {organisationsResults, TicketsResults, UsersResults};
-        return arrayOfEverything;
-      }
-      else {
-        console.log('k ELSE SSS>>>', k)
-        let response = this.allOrganisationDataResult(organisationsResults, TicketsResults, UsersResults, term);
-        console.log('response org>>>', response)
-        return response;
-      }
-    })
-    console.log('>values>>', values)
-    return values;
+    let response = this.allOrganisationDataResult(organisations, tickets, users, term, filterByTerm);
+          console.log('response org>>>', response)
+          return response;
+    // const finalResult = this.resultBasedOnFilter(organisations, tickets, users, filterByTerm, term);
+    // return finalResult;
   }
 
   allOrganisationDataResult(orgs, tickets, users, searchTerm) {
-    const orgsResult = this.getDataBasedOnOrgId(orgs, searchTerm, "_id");
-    const ticketsResult = this.getDataBasedOnOrgId(tickets, searchTerm,'organization_id');
-    const usersResult = this.getDataBasedOnOrgId(users, searchTerm,'organization_id');
+    const orgsResult = this.getDataBasedOnOrgId(orgs, searchTerm);
+    const ticketsResult = this.getDataBasedOnOrgId(tickets, searchTerm);
+    const usersResult = this.getDataBasedOnOrgId(users, searchTerm);
     const arrayOfEverything = [orgsResult, ticketsResult, usersResult];
     return arrayOfEverything;
   }
 
-  getDataBasedOnOrgId(array, searchTerm, idReference) {
+  getDataBasedOnOrgId(array, searchTerm) {
     let values = array.map(k => {
       console.log("k>>>", Object.keys(k));
-      let idIsString = checkTypeOfItem(k[idReference]);
+      let idIsString = checkTypeOfItem(k[searchTerm]);
       let orgsWithId = checkValueIncludesTerm(idIsString, searchTerm, k);
+      console.log('>orgsWithId>>', orgsWithId)
       return orgsWithId;
     });
     let uniqueArray = values.filter((item, pos) => values.indexOf(item) == pos);
@@ -106,11 +88,12 @@ function checkTypeOfItem(value) {
 }
 
 function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
+  console.log('>valueInArray>>', valueInArray.toLowerCase())
   if (valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
     return parentObject;
   }
   // else {
-  //   console.log("in here>>>", valueInArray); //TODO MIGHT NEED TO ADD SOMETHING HERE
+  //   console.log("in here>>>"); //TODO MIGHT NEED TO ADD SOMETHING HERE
   // }
 }
 function arrayToObject(array) {
