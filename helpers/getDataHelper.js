@@ -6,25 +6,28 @@ class GetDataHelper {
   constructor() {}
 
   getAll(term, filterByTerm) {
-    const getsAllResultsOfOrganisation = filterByValue(Organisations, term);
+
+    const organisationsResults = filterByValue(Organisations, term);
     const TicketsResults = filterByValue(Tickets, term);
     const UsersResults = filterByValue(Users, term);
+
+    const finalResult = this.resultBasedOnFilter(organisationsResults, TicketsResults, UsersResults, filterByTerm, term);
+    return finalResult;
+  }
+  resultBasedOnFilter(organisationsResults, TicketsResults, UsersResults, filterByTerm, term) {
     let values = (filterByTerm).map((k) => {
       if (k === 'all') {
-        let response = this.allDataResult(getsAllResultsOfOrganisation, TicketsResults, UsersResults);
-        console.log('>>response>', response);
+        let arrayOfEverything = {organisationsResults, TicketsResults, UsersResults};
+        return arrayOfEverything;
       }
       if(k === 'organisation_id') {
-        let response = this.allOrganisationDataResult(getsAllResultsOfOrganisation, TicketsResults, UsersResults, term);
+        let response = this.allOrganisationDataResult(organisationsResults, TicketsResults, UsersResults, term);
         console.log('response org>>>', response)
         return response;
       }
     })
     console.log('>values>>', values)
-  }
-  allDataResult(orgs, tickets, users) {
-    let arrayOfEverything = [orgs, tickets, users];
-    return arrayOfEverything;
+    return values;
   }
   allOrganisationDataResult(orgs, tickets, users, searchTerm) {
     const orgsResult = this.getDataBasedOnOrgId(orgs, searchTerm,'_id');

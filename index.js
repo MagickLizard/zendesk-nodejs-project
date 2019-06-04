@@ -1,9 +1,9 @@
-// const program = require("commander");
+
 const GetDataHelper = require("./helpers/getDataHelper");
 const chalk = require("chalk");
 const figlet = require("figlet");
 const inquirer = require("inquirer");
-const ora = require("ora");
+const ora = ("ora");
 
 const initalBanner = () => {
   console.log(
@@ -54,9 +54,10 @@ const askQuestions = () => {
         "Please type into the command what you would like to search and press enter.",
       validate: function validateWord(word) {
         console.log("what is word>>", word);
-        const getDataHelper = new GetDataHelper();
+          const getDataHelper = new GetDataHelper();
         const results = getDataHelper.getAll(word, arrayFilter);
-        console.log(">GetDataHelper>>", results);
+        console.log('>>response>', results)
+        return results;
         
         const expression = /^[A-Za-z]+$/g;
         const regex = new RegExp(expression);
