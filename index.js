@@ -32,7 +32,19 @@ const searchBox = () => {
 };
 
 const askQuestions = () => {
+  let arrayFilter = [];
   const questions = [
+    {
+      type: 'list',
+      name: 'size',
+      message: 'Would you like to filter by:',
+      choices: ['All', 'Organisation_Id'],
+      filter: function(val) {
+        console.log('>val>>', val)
+        arrayFilter.push(val.toLowerCase())
+        return val.toLowerCase();
+      }
+    },
     {
       name: "word",
       above: searchBox(),
@@ -43,9 +55,9 @@ const askQuestions = () => {
       validate: function validateWord(word) {
         console.log("what is word>>", word);
         const getDataHelper = new GetDataHelper();
-        const results = getDataHelper.getAll(word);
+        const results = getDataHelper.getAll(word, arrayFilter);
         console.log(">GetDataHelper>>", results);
-
+        
         const expression = /^[A-Za-z]+$/g;
         const regex = new RegExp(expression);
         // setTimeout(() => {

@@ -1,16 +1,49 @@
 const Organisations = require("../api/organizations.json");
-const Tickets = require("../api/organizations.json");
-const Users = require("../api/organizations.json");
+const Tickets = require("../api/tickets.json");
+const Users = require("../api/users.json");
 
 class GetDataHelper {
   constructor() {}
 
-  getAll(term) {
-    // console.log("get all>>>", term);
-    let checkResult = filterByValue(Organisations, term);
-    console.log(">checkResult>>", checkResult);
+  getAll(term, filterByTerm) {
+    const getsAllResultsOfOrganisation = filterByValue(Organisations, term);
+    const TicketsResults = filterByValue(Tickets, term);
+    const UsersResults = filterByValue(Users, term);
+    let values = (filterByTerm).map((k) => {
+      if (k === 'all') {
+        let response = this.allDataResult(getsAllResultsOfOrganisation, TicketsResults, UsersResults);
+        console.log('>>response>', response);
+      }
+      if(k === 'organisation_id') {
+        let response = this.allOrganisationDataResult(getsAllResultsOfOrganisation, TicketsResults, UsersResults, term);
+        console.log('response org>>>', response)
+        return response;
+      }
+    })
+    console.log('>values>>', values)
+  }
+  allDataResult(orgs, tickets, users) {
+    let arrayOfEverything = [orgs, tickets, users];
+    return arrayOfEverything;
+  }
+  allOrganisationDataResult(orgs, tickets, users, searchTerm) {
+    const orgsResult = this.getDataBasedOnOrgId(orgs, searchTerm,'_id');
+    const ticketsResult = this.getDataBasedOnOrgId(tickets, searchTerm,'organization_id');
+    const usersResult = this.getDataBasedOnOrgId(users, searchTerm,'organization_id');
+    const arrayOfEverything = [orgsResult, ticketsResult, usersResult];
+    return arrayOfEverything;
   }
 
+  getDataBasedOnOrgId(array, searchTerm, idReference) {
+    let values = (array).map((k) => {
+      let idIsString = checkTypeOfItem(k[idReference]);
+      let orgsWithId = checkValueIncludesTerm(idIsString, searchTerm, k);
+      return orgsWithId;
+    })
+    let uniqueArray = values.filter((item, pos) => values.indexOf(item) == pos)
+    const removingBadValues = (uniqueArray).filter((i) =>  i);
+    return removingBadValues;
+  }
 }
 function filterByValue(array, searchTerm) {
   let arrayWithResults = [];
@@ -44,24 +77,7 @@ function filterByValue(array, searchTerm) {
   });
   return arrayWithResults;
 }
-function iterateOverNestedValues(values, searchTerm, parentObject) {
-  return Object.keys(values).some(key => {
-    if (typeof values[key] === "string") {
-      let nestedResult = checkValueIncludesTerm(
-        values[key],
-        searchTerm,
-        parentObject
-      );
-      if (nestedResult) {
-        console.log("nestedResult>>>", typeof nestedResult, nestedResult);
-        return nestedResult;
-      }
-      return values;
-    }
-  });
-  //  const allDataArray = Object.keys(nestedObject).filter((i) => (typeof nestedObject[i] === "string", nestedObject))
-  //  console.log('>allDataArray111>>', allDataArray)
-}
+
 function checkTypeOfItem(value) {
   try {
     if (typeof value === "string") {
