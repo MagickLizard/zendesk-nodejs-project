@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ./index.js",
     "lint": "eslint . --fix",
-    "test": "mocha ./test/get-data-helper_test.js --reporter spec"
+    "test": "mocha ./test/ --reporter spec"
   },
   "repository": {
     "type": "git",

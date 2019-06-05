@@ -11,18 +11,18 @@ class GetDataHelper {
   getAll(searchTerm) {
     const searchTermValidated = checkTypeOfItem(searchTerm);
     this.organisations = filterByValue(Organisations, searchTermValidated);
-    this.tickets = filterByValue(Tickets, searchTermValidated);
+    this.tickets = filterByValue(Tickets, searchTermValidated);    
     this.users = filterByValue(Users, searchTermValidated);
     if(this.users.length == 0 && this.tickets == 0 && this.organisations == 0) {
       return 'Nothing was found, please search again.';
     }
-    return {all_relating_information: [{organisations: this.organisations, tickets: this.tickets, users: this.users}]};
+    return {all_relating_information: {organisations: this.organisations, tickets: this.tickets, users: this.users}};
   }
 
   getByFilterOptions(searchTerm, filterByKey, parentSummary) {
     return this.resultBasedOnFilter(searchTerm, filterByKey, Object.keys(parentSummary));
   }
-  resultBasedOnFilter(searchTerm, filterByKey, parentSummary) {
+  resultBasedOnFilter(searchTerm, filterByKey, parentSummary) {    
     const searchTermValidated = checkTypeOfItem(searchTerm);
     if (parentSummary && parentSummary.organisations) {
       return this.getOrganisationByFilters(searchTermValidated, filterByKey);
@@ -31,7 +31,7 @@ class GetDataHelper {
       return this.getTicketsByFilters(searchTermValidated, filterByKey);
     }
     else if (parentSummary && parentSummary.users) {
-      return this.getUsersByFilters(searchTermValidated, filterByKey);
+      return this.getUsersByFilters(searchTermValidated, filterByKey);      
     }
     else {
       return [];
@@ -43,7 +43,7 @@ class GetDataHelper {
     this.tickets = this.searchResultsByFilters(Tickets, searchTermValidated, 'organization_id');
     this.users = this.searchResultsByFilters(Users, searchTermValidated, 'organization_id');
     if(this.users.length == 0 && this.tickets == 0 && this.organisations == 0) {
-      return 'Nothing was found, please search again.';
+      return 'noValues';
     }
     return {organisation: this.organisations, organisation_related_information: [{related_tickets: this.tickets, related_users: this.users}]};
   }
@@ -54,7 +54,7 @@ class GetDataHelper {
     this.users = this.searchResultsByFilters(Users, getOrganisationId, 'organization_id');
     this.organisations = this.searchResultsByFilters(Organisations, getOrganisationId, '_id');
     if(this.users.length == 0 && this.tickets == 0 && this.organisations == 0) {
-      return 'Nothing was found, please search again.';
+      return 'noValues';
     }
     return {ticket: this.tickets, ticket_related_information: [{related_organisations: this.organisations, related_users: this.users}]};
   }
@@ -64,7 +64,7 @@ class GetDataHelper {
     this.tickets = this.searchResultsByFilters(Tickets, getOrganisationId, 'organization_id');
     this.organisations = this.searchResultsByFilters(Organisations, getOrganisationId, '_id');
     if(this.users.length == 0 && this.tickets == 0 && this.organisations == 0) {
-      return 'Nothing was found, please search again.';
+      return 'noValues';
     }
     return {user: this.users, ticket_related_information: [{related_organisations: this.organisations, related_users: this.tickets}]};
   }
@@ -152,7 +152,7 @@ function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
       return parentObject;
     }
   } catch (Error) {
-    return "ERROR";
+    return "";
   }
 }
 function arrayToObject(array) {
