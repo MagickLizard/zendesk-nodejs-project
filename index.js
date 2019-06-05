@@ -34,7 +34,6 @@ const askQuestions = () => {
           return choice.toLowerCase();
         } else if (choice.toLowerCase().includes("organisation")) {
           let topLevel = getUsersFiltersHelper.getAllFilters(choice);
-          console.log(">topLevel>>", topLevel);
           const organisations = {organisations: topLevel.organisations};
           return organisations;
         } else if (choice.toLowerCase().includes("tickets")) {
@@ -81,10 +80,12 @@ const searchOnInput = (child_key, filters) => {
         if(child_key === 'all') {
           const results = getDataHelper.getAll(word, child_key, filters);
           console.log(">GetDataHelper>>", results);
+          return results;
         }
         else {
-          const results = getDataHelper.getAll(word, child_key, filters);
+          const results = getDataHelper.resultBasedOnFilter(word, child_key, filters);
           console.log(">GetDataHelper>>", results);
+          return results;
         }
 
 
@@ -106,7 +107,7 @@ const run = async () => {
   initalBanner();
   const answers = await askQuestions();
   const {filters} = answers;
-  console.log(">filters>>", filters);
+
   if (filters == "all") {
     const searchBasedOnId = await searchOnInput(filters, filters);
     return searchBasedOnId;
@@ -114,21 +115,20 @@ const run = async () => {
   else if (filters.organisations) {
     const answersSecond = await askQuestionSecond(filters.organisations);
     const {child_keys} = answersSecond;
-    console.log(">>child_keys>", child_keys);
+
     const searchBasedOnId = await searchOnInput(child_keys, filters);
     return searchBasedOnId;
   }
   else if (filters.tickets) {
     const answersSecond = await askQuestionSecond(filters.tickets);
     const {child_keys} = answersSecond;
-    console.log(">>child_keys>", child_keys);
+
     const searchBasedOnId = await searchOnInput(child_keys, filters);
     return searchBasedOnId;
   }
   else if (filters.users) {
     const answersSecond = await askQuestionSecond(filters.users);
     const {child_keys} = answersSecond;
-    console.log(">>child_keys>", child_keys);
     const searchBasedOnId = await searchOnInput(child_keys, filters);
     return searchBasedOnId;
   }

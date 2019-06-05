@@ -10,18 +10,10 @@ class GetDataHelper {
     console.log('filterByKey>>>', filterByKey)
     console.log('parentFilter>>>', Object.keys(parentSummary))
     
-    
-    const organisationsResults = filterByValue(Organisations, searchTerm);
-    const TicketsResults = filterByValue(Tickets, searchTerm);
-    const UsersResults = filterByValue(Users, searchTerm);
-
-    const finalResult = this.resultBasedOnFilter(organisationsResults, TicketsResults, UsersResults, searchTerm, filterByKey, Object.keys(parentSummary));
+    const finalResult = this.resultBasedOnFilter(searchTerm, filterByKey, Object.keys(parentSummary));
     return finalResult;
   }
-  getAll(searchTerm, filterByKey) {
-    console.log('searchTerm - getAll>>>', searchTerm)
-    console.log('filterByKey - getAll>>>', filterByKey)
-  
+  getAll(searchTerm) {
     const organisations = filterByValue(Organisations, searchTerm);
     const tickets = filterByValue(Tickets, searchTerm);
     const users = filterByValue(Users, searchTerm);
@@ -29,35 +21,28 @@ class GetDataHelper {
 
   }
 
-  resultBasedOnFilter(organisationsResults, TicketsResults, UsersResults, searchTerm, filterByKey, parentSummary) {
-    let values = (parentSummary).map((k) => {
-      console.log('k>>>', k)
-      if(k === 'organisations') {
-        let response = this.allOrganisationDataResult(organisationsResults, searchTerm, filterByKey);
+  resultBasedOnFilter(searchTerm, filterByKey, parentSummary) {
+    console.log('parentSummary>>>', parentSummary)
+      if(parentSummary.organisations) {
+        let response = this.allOrganisationDataResult(Organisations, searchTerm, filterByKey);
+        //TODO: get tickets and users related to organisation
         return response;
       }
-      if(k === 'tickets') {
-        let response = this.allOrganisationDataResult(TicketsResults, searchTerm, filterByKey);
+      if(parentSummary.tickets) {
+        let response = this.allOrganisationDataResult(Tickets, searchTerm, filterByKey);
         return response;
       }
-      if(k === 'users') {
-        let response = this.allOrganisationDataResult(UsersResults ,searchTerm, filterByKey);
+      if(parentSummary.users) {
+        let response = this.allOrganisationDataResult(Users ,searchTerm, filterByKey);
         return response;
       }
-    })
-    console.log('>values>>', values)
-    return values;
+
   }
   
   allOrganisationDataResult(jsonData, searchTerm, filterByKey) {
     const anyResult = this.getDataBasedOnOrgId(jsonData, searchTerm, filterByKey);
     console.log('anyResult>>>', anyResult);
     return anyResult;
-    
-    // const ticketsResult = this.getDataBasedOnOrgId(tickets, searchTerm,'organization_id');
-    // const usersResult = this.getDataBasedOnOrgId(users, searchTerm,'organization_id');
-    // const arrayOfEverything = [orgsResult, ticketsResult, usersResult];
-    // return arrayOfEverything;
   }
 
   getDataBasedOnOrgId(array, searchTerm, idReference) {
