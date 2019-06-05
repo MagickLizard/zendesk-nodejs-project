@@ -13,7 +13,7 @@ describe("GetUsersFiltersHelper()", () => {
     expect(getUsersFiltersHelper).to.exist;
   });
   describe("resultBasedOnFilter()", () => {
-    it("#getAllKeys - Should return all key ids.", () => {
+    it("#getAllKeys() - Should return all key ids.", () => {
      const keyFixture =  [ '_id',
           'url',
           'external_id',
