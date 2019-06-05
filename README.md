@@ -1,6 +1,6 @@
 # Zendesk code challenge
 
-Code challenge which searches through JSON files.
+Code challenge that searches through JSON files.
 
 ## Prerequisites
 
