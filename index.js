@@ -3,6 +3,8 @@ const GetUsersFiltersHelper = require("./helpers/getUsersFiltersHelper");
 const chalk = require("chalk");
 const figlet = require("figlet");
 const inquirer = require("inquirer");
+const ora = require('ora');
+const prettyjson = require('prettyjson');
 
 const initalBanner = () => {
   console.log(
@@ -75,18 +77,19 @@ const searchOnInput = (child_key, filters) => {
         const expression = /^[A-Za-z0-9]+$/g;
         const regex = new RegExp(expression);
         if(word.match(regex) !== null) {
-
         const getDataHelper = new GetDataHelper();
-      
         if(child_key === 'all') {
           const results = getDataHelper.getAll(word, child_key, filters);
-
-          return results;
+          spinner.text = console.log(chalk.magenta(prettyjson.render(results)));
         }
         else {
           const results = getDataHelper.resultBasedOnFilter(word, child_key, filters);
-          return results;
+          let spinner = ora().succeed();
+          spinner.text = console.log(chalk.magenta(prettyjson.render(results)));
+          // return console.log(chalk.magenta(prettyjson.render(results)));
         }
+
+
       }
         else {
           return console.log(
@@ -127,11 +130,6 @@ const run = async () => {
     const answersSecond = await askQuestionSecond(filters.users);
     const {child_keys} = answersSecond;
     const searchBasedOnId = await searchOnInput(child_keys, filters);
-    setTimeout(() => {
-      const spinner = ora().start();
-      spinner.color = "yellow";
-      spinner.text = "Loading rainbows";
-    }, 20);
     return searchBasedOnId;
   }
   else {

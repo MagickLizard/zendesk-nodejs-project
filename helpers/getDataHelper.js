@@ -122,7 +122,6 @@ function checkTypeOfItem(value) {
       return value;
     }
   } catch (Error) {
-    console.log("Error in type>>>", Error);
     return Error;
   }
 }
@@ -134,7 +133,6 @@ function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
     } 
   }
   catch (Error) {
-    console.log("Error>>>", Error);
     return "Please search something more refined.";
   }
 }

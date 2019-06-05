@@ -6,7 +6,7 @@ const mocha = require('mocha');
 const should = require('chai').should;
 
 describe('GetSupportSummaries()', () => {
-  it('should return the current user\'s latest conversations sorted by latest message\'s timestamp', async () => {
+  it('should return a list of user related data', async () => {
     const getDataHelper = new GetSupportSummaries();
     console.log('getDataHelper>>', getDataHelper)
     getDataHelper.getAll().should.deep.equal();
