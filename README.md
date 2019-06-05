@@ -1,8 +1,8 @@
 # Zendesk code challenge
 
-Code challenge which searches through JSON files.
+This is a code challenge that searches through JSON files.
 
-## Prerequisites
+## To begin - Prerequisites
 
 Nodejs 10.16.0 or greater
 
@@ -23,3 +23,14 @@ Install dependencies
 Run CLI app
 
 ``` yarn start ```
+
+Run test cases
+
+``` yarn test ```
+
+Run eslint
+
+``` yarn eslint . ```
+
+## How to use:
+To navigate the cli use enter and arrow keys :)
