@@ -11,11 +11,11 @@ class GetDataHelper {
     return finalResult;
   }
   getAll(searchTerm) {
-    const organisations = filterByValue(Organisations, searchTerm);
-    const tickets = filterByValue(Tickets, searchTerm);
-    const users = filterByValue(Users, searchTerm);
+    const searchTermValidated = checkTypeOfItem(searchTerm);
+    const organisations = filterByValue(Organisations, searchTermValidated);
+    const tickets = filterByValue(Tickets, searchTermValidated);
+    const users = filterByValue(Users, searchTermValidated);
     return {organisations, tickets, users};
-
   }
 
   resultBasedOnFilter(searchTerm, filterByKey, parentSummary) {
@@ -128,12 +128,12 @@ function checkTypeOfItem(value) {
 
 function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
   try {
-    if (valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return parentObject;
-    } 
+      if (searchTerm && valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return parentObject;
+      } 
   }
   catch (Error) {
-    return "Please search something more refined.";
+    // return "Please search something more refined.";
   }
 }
 function arrayToObject(array) {

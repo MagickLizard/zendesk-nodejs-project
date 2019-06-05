@@ -7,8 +7,6 @@ class GetUsersFiltersHelper {
     return this.resultBasedOnFilter();
   }
   resultBasedOnFilter() {
-
-  
     const organisations = this.getAllKeys(Organisations);
     const users = this.getAllKeys(Users);
     const tickets = this.getAllKeys(Tickets);
