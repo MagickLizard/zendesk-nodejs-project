@@ -1,8 +1,7 @@
-/* global it:false, describe:false, beforeEach:false, afterEach:false */
+/* global it:false, describe:false, beforeEach:false */
 
 const GetDataHelper = require("../helpers/getDataHelper.js");
 const fixture = require("./fixtures/fixtures.js");
-const should = require("chai").should;
 const expect = require("chai").expect;
 
 describe("GetSupportSummaries()", () => {
@@ -10,14 +9,14 @@ describe("GetSupportSummaries()", () => {
   beforeEach(() => {
     getDataHelper = new GetDataHelper();
   });
-  it("Class should be defined", () => {
+  it("Class should be defined", () => { 
     getDataHelper = new GetDataHelper();
     expect(getDataHelper).to.exist;
   });
   describe("getAll()", () => {
     it("getAll() - should return a list of related data", () => {
       const result = getDataHelper.getAll(
-        "0db0c1da-8901-4dc3-a469-fe4b500d0fca"
+        "0db0c1da-8901-4dc3-a469-fe4b500d0fca" 
       );
       expect(result).to.exist;
       expect(result).to.deep.equal(fixture._getAllBasedTerm());
@@ -34,7 +33,7 @@ describe("GetSupportSummaries()", () => {
       expect(result).to.deep.equal(errorFixture);
     });
   });
-  describe("resultBasedOnFilter()", () => {
+  describe("resultBasedOnFilter()", () => { 
     it("resultBasedOnFilter - Should return organisation, tickets and users that are related by organisation", () => {
       const summaryKeys = { users: 
         [ '_id',
@@ -79,8 +78,6 @@ describe("GetSupportSummaries()", () => {
         "_id"
       );
       expect(result).to.exist;
-      console.log('>>result>', result)
-      
       expect(result).to.deep.equal([]);
     });
   });

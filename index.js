@@ -3,7 +3,6 @@ const GetUsersFiltersHelper = require("./helpers/getUsersFiltersHelper");
 const chalk = require("chalk");
 const figlet = require("figlet");
 const inquirer = require("inquirer");
-const ora = require('ora');
 const prettyjson = require('prettyjson');
 
 const initalBanner = () => {
@@ -80,16 +79,15 @@ const searchOnInput = (child_key, filters) => {
         const getDataHelper = new GetDataHelper();
         if(child_key === 'all') {
           const results = getDataHelper.getAll(word, child_key, filters);
-          spinner.text = console.log(chalk.magenta(prettyjson.render(results)));
+           console.log(chalk.magenta(prettyjson.render(results)));
         }
         else {
           const results = getDataHelper.resultBasedOnFilter(word, child_key, filters);
-          let spinner = ora().succeed();
-          spinner.text = console.log(chalk.magenta(prettyjson.render(results)));
+          console.log(chalk.magenta(prettyjson.render(results)));
         }
       }
         else {
-          return console.log(
+          console.log(
             chalk.magenta("A issue occured with this search.")
           );
         }
@@ -112,22 +110,17 @@ const run = async () => {
   else if (filters.organisations) {
     const answersSecond = await askQuestionSecond(filters.organisations);
     const {child_keys} = answersSecond;
-
-    const searchBasedOnId = await searchOnInput(child_keys, filters);
-    return searchBasedOnId;
+    return await searchOnInput(child_keys, filters);
   }
   else if (filters.tickets) {
     const answersSecond = await askQuestionSecond(filters.tickets);
     const {child_keys} = answersSecond;
-
-    const searchBasedOnId = await searchOnInput(child_keys, filters);
-    return searchBasedOnId;
+    return await searchOnInput(child_keys, filters);
   }
   else if (filters.users) {
     const answersSecond = await askQuestionSecond(filters.users);
     const {child_keys} = answersSecond;
-    const searchBasedOnId = await searchOnInput(child_keys, filters);
-    return searchBasedOnId;
+    return await searchOnInput(child_keys, filters);
   }
   else {
     return console.log(
