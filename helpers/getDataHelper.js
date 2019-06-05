@@ -6,7 +6,6 @@ class GetDataHelper {
   constructor() {}
 
   getByFilterOptions(searchTerm, filterByKey, parentSummary) {
-    
     const finalResult = this.resultBasedOnFilter(searchTerm, filterByKey, Object.keys(parentSummary));
     return finalResult;
   }
@@ -20,47 +19,49 @@ class GetDataHelper {
 
   resultBasedOnFilter(searchTerm, filterByKey, parentSummary) {
     const searchTermValidated = checkTypeOfItem(searchTerm);
-      if(parentSummary.organisations) {
-        const organisations = this.allOrganisationDataResult(Organisations, searchTermValidated, filterByKey);
-        const tickets = this.allOrganisationDataResult(Tickets, searchTermValidated, 'organization_id');
-        const users = this.allOrganisationDataResult(Users, searchTermValidated, 'organization_id');
-        const response = {organisation: organisations, organisation_related_information: tickets, users};
-        return response;
-      }
-      if(parentSummary.tickets) {
-        const tickets = this.allOrganisationDataResult(Tickets, searchTermValidated, filterByKey);
-        const getOrganisationId = this.getAllInformation(tickets, 'organization_id');
-        const users = this.allOrganisationDataResult(Users, getOrganisationId, 'organization_id');
-        const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
-        const response = {ticket: tickets, ticket_related_information: organisations, users};
-        return response;
-      }
-      if(parentSummary.users) {
-        const users = this.allOrganisationDataResult(Users, searchTerm, filterByKey);
-        const getOrganisationId = this.getAllInformation(users, 'organization_id');
-        const tickets = this.allOrganisationDataResult(Tickets, getOrganisationId, 'organization_id');
-        const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
-        const response = {user: organisations, user_related_information: tickets, users};
-        return response;
-      }
+    if(parentSummary && parentSummary.organisations) {
+      const organisations = this.allOrganisationDataResult(Organisations, searchTermValidated, filterByKey);
+      const tickets = this.allOrganisationDataResult(Tickets, searchTermValidated, 'organization_id');
+      const users = this.allOrganisationDataResult(Users, searchTermValidated, 'organization_id');
+      const response = {organisation: organisations, organisation_related_information: tickets, users};
+      return response;
+    }
+    if(parentSummary && parentSummary.tickets) {
+      const tickets = this.allOrganisationDataResult(Tickets, searchTermValidated, filterByKey);
+      const getOrganisationId = this.getAllInformation(tickets, 'organization_id');
+      const users = this.allOrganisationDataResult(Users, getOrganisationId, 'organization_id');
+      const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
+      const response = {ticket: tickets, ticket_related_information: organisations, users};
+      return response;
+    }
+    if(parentSummary && parentSummary.users) {
+      
+      const users = this.allOrganisationDataResult(Users, searchTermValidated, filterByKey);
+      const getOrganisationId = this.getAllInformation(users, 'organization_id');
+      const tickets = this.allOrganisationDataResult(Tickets, getOrganisationId, 'organization_id');
+      const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
+      const response = {user: organisations, user_related_information: tickets};
+      return response;
+    }
+  else {
+      return [];
+       }
   }
   getAllInformation(array, stringOfKeyWanted) {
-    let keyOfField = (array).reduce((previous, current) => {
-      if(current[stringOfKeyWanted] ) {
-        return current[stringOfKeyWanted] 
+    const keyOfField = array.reduce((previous, current) => {
+      if (current[stringOfKeyWanted]) {
+        return current[stringOfKeyWanted];
       }
-
     }, {});
-    if(keyOfField) {
+    if (keyOfField) {
       const keyFormatted = checkTypeOfItem(keyOfField);
       return keyFormatted;
     }
     return "";
   }
-  
+
   allOrganisationDataResult(jsonData, searchTerm, filterByKey) {
-    const anyResult = this.getDataBasedOnOrgId(jsonData, searchTerm, filterByKey);
-    return anyResult;
+    return this.getDataBasedOnOrgId(jsonData, searchTerm, filterByKey);
   }
 
   getDataBasedOnOrgId(array, searchTerm, idReference) {
@@ -116,9 +117,11 @@ function checkTypeOfItem(value) {
       return value;
     } else if (typeof value === "object" && value.length > 0) {
       return arrayToObject(value);
-    } else if (typeof value === "number") {
+    }
+    else if (typeof value === "number") {
       return value.toString();
-    } else {
+    }
+    else {
       return value;
     }
   } catch (Error) {
@@ -128,11 +131,13 @@ function checkTypeOfItem(value) {
 
 function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
   try {
-      if (searchTerm && valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
-        return parentObject;
-      } 
-  }
-  catch (Error) {
+    if (
+      searchTerm &&
+      valueInArray.toLowerCase().includes(searchTerm.toLowerCase())
+    ) {
+      return parentObject;
+    }
+  } catch (Error) {
     // return "Please search something more refined.";
   }
 }

@@ -86,10 +86,7 @@ const searchOnInput = (child_key, filters) => {
           const results = getDataHelper.resultBasedOnFilter(word, child_key, filters);
           let spinner = ora().succeed();
           spinner.text = console.log(chalk.magenta(prettyjson.render(results)));
-          // return console.log(chalk.magenta(prettyjson.render(results)));
         }
-
-
       }
         else {
           return console.log(
