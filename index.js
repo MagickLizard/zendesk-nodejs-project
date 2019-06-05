@@ -75,6 +75,16 @@ const searchOnInput = (child_key, filters) => {
         console.log("Search term:", word);
         const expression = /^[A-Za-z0-9]+$/g;
         const regex = new RegExp(expression);
+        if(word === ""){
+          console.log('word>>>', typeof word);
+          console.log('child_key>>>', child_key)
+          console.log('>filters>>', filters)
+        
+          const getDataHelper = new GetDataHelper();
+
+          const results = getDataHelper.getItemsWithoutInput(word, child_key, filters);
+          console.log(chalk.magenta(prettyjson.render(results)));
+        }
         if(word.match(regex) !== null) {
         const getDataHelper = new GetDataHelper();
         if(child_key === 'all') {

@@ -8,43 +8,45 @@ class GetDataHelper {
     this.tickets = '';
     this.organisations = '';
   }
-
   getAll(searchTerm) {
     const searchTermValidated = checkTypeOfItem(searchTerm);
-    const organisations = filterByValue(Organisations, searchTermValidated);
-    const tickets = filterByValue(Tickets, searchTermValidated);
-    const users = filterByValue(Users, searchTermValidated);
-    return {organisations, tickets, users};
+    this.organisations = filterByValue(Organisations, searchTermValidated);
+    this.tickets = filterByValue(Tickets, searchTermValidated);
+    this.users = filterByValue(Users, searchTermValidated);
+    return {all_relating_information: [{organisations: this.organisations, tickets: this.tickets, users: this.users}]};
   }
+
+  // getAll(searchTerm) {
+  //   const searchTermValidated = checkTypeOfItem(searchTerm);
+  //   this.organisations = filterByValue(Organisations, searchTermValidated);
+  //   this.tickets = filterByValue(Tickets, searchTermValidated);
+  //   this.users = filterByValue(Users, searchTermValidated);
+  //   return {all_relating_information: [{organisations: this.organisations, tickets: this.tickets, users: this.users}]};
+  // }
   getByFilterOptions(searchTerm, filterByKey, parentSummary) {
     return this.resultBasedOnFilter(searchTerm, filterByKey, Object.keys(parentSummary));
   }
   resultBasedOnFilter(searchTerm, filterByKey, parentSummary) {
     const searchTermValidated = checkTypeOfItem(searchTerm);
-    if(parentSummary && parentSummary.organisations) {
-      const organisations = this.allOrganisationDataResult(Organisations, searchTermValidated, filterByKey);
-      const tickets = this.allOrganisationDataResult(Tickets, searchTermValidated, 'organization_id');
-      const users = this.allOrganisationDataResult(Users, searchTermValidated, 'organization_id');
-      const response = {organisation: organisations, organisation_related_information: tickets, users};
-      return response;
+    if (parentSummary && parentSummary.organisations) {
+      this.organisations = this.searchResultsByFilters(Organisations, searchTermValidated, filterByKey);
+      this.tickets = this.searchResultsByFilters(Tickets, searchTermValidated, 'organization_id');
+      this.users = this.searchResultsByFilters(Users, searchTermValidated, 'organization_id');
+      return {organisation: this.organisations, organisation_related_information: [{related_tickets: this.tickets, related_users: this.users}]};
     }
-    else if(parentSummary && parentSummary.tickets) {
-      const tickets = this.allOrganisationDataResult(Tickets, searchTermValidated, filterByKey);
-      const getOrganisationId = this.getAllInformation(tickets, 'organization_id');
-      const users = this.allOrganisationDataResult(Users, getOrganisationId, 'organization_id');
-      const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
-      const response = {ticket: tickets, ticket_related_information: organisations, users};
-      return response;
+    else if (parentSummary && parentSummary.tickets) {
+      this.tickets = this.searchResultsByFilters(Tickets, searchTermValidated, filterByKey);
+      const getOrganisationId = this.getAllInformation(this.tickets, 'organization_id');
+      this.users = this.searchResultsByFilters(Users, getOrganisationId, 'organization_id');
+      this.organisations = this.searchResultsByFilters(Organisations, getOrganisationId, '_id');
+      return {ticket: this.tickets, ticket_related_information: [{related_organisations: this.organisations, related_users: this.users}]};
     }
-    else if(parentSummary && parentSummary.users) {
-      const users = this.allOrganisationDataResult(Users, searchTermValidated, filterByKey);
-      const getOrganisationId = this.getAllInformation(users, 'organization_id');
-      const tickets = this.allOrganisationDataResult(Tickets, getOrganisationId, 'organization_id');
-      const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
-      const response = {user: users, user_related_information: tickets, organisations};
-      console.log('>response>>', response)
-      
-      return response;
+    else if (parentSummary && parentSummary.users) {
+      this.users = this.searchResultsByFilters(Users, searchTermValidated, filterByKey);
+      const getOrganisationId = this.getAllInformation(this.users, 'organization_id');
+      this.tickets = this.searchResultsByFilters(Tickets, getOrganisationId, 'organization_id');
+      this.organisations = this.searchResultsByFilters(Organisations, getOrganisationId, '_id');
+      return {user: this.users, ticket_related_information: [{related_organisations: this.organisations, related_users: this.tickets}]};
     }
     else {
       return [];
@@ -63,32 +65,29 @@ class GetDataHelper {
     return "";
   }
 
-  allOrganisationDataResult(jsonData, searchTerm, filterByKey) {
-    return this.getDataBasedOnOrgId(jsonData, searchTerm, filterByKey);
+  searchResultsByFilters(jsonData, searchTerm, filterByKey) {
+    return this.getResultsByKey(jsonData, searchTerm, filterByKey);
   }
-  getDataBasedOnOrgId(array, searchTerm, idReference) {
-    let values = (array).map((k) => {
+  getResultsByKey(array, searchTerm, idReference) {
+    const values = (array).map((k) => {
 
-      let idIsString = checkTypeOfItem(k[idReference] || "");
-      if (idIsString) {
-        let orgsWithId = checkValueIncludesTerm(idIsString, searchTerm, k);
-        return orgsWithId;
+      const keyIsString = checkTypeOfItem(k[idReference] || "");
+      if (keyIsString) {
+        return checkValueIncludesTerm(keyIsString, searchTerm, k);
       }
     })
-    let uniqueArray = values.filter((item, pos) => values.indexOf(item) == pos)
-    const removingBadValues = (uniqueArray).filter((i) =>  i);
-    return removingBadValues;
+    const uniqueArray = values.filter((item, pos) => values.indexOf(item) == pos)
+    return (uniqueArray).filter((i) =>  i);
   }
 }
 function filterByValue(array, searchTerm) {
   let arrayWithResults = [];
   array.filter(o => {
-    //TODO: MAKE A FILTER FOR STRING AND OBJECT
     return Object.keys(o).some(key => {
       let values = checkTypeOfItem(o[key]);
       if (values) {
         if (typeof values === "string") {
-          let checkedTopValue = checkValueIncludesTerm(values, searchTerm, o); //CANNOT SUPPORT HTTP://
+          let checkedTopValue = checkValueIncludesTerm(values, searchTerm, o);
           if (checkedTopValue) {
             arrayWithResults.push(checkedTopValue);
           }
@@ -132,15 +131,12 @@ function checkTypeOfItem(value) {
 }
 
 function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
-  try {
-    if (
-      searchTerm &&
-      valueInArray.toLowerCase().includes(searchTerm.toLowerCase())
-    ) {
+  try {    
+    if (searchTerm && valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
       return parentObject;
     }
   } catch (Error) {
-    // return "Please search something more refined.";
+    return "";
   }
 }
 function arrayToObject(array) {

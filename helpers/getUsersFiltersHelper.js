@@ -16,7 +16,7 @@ class GetUsersFiltersHelper {
   getAllKeys(array) {
     const details = array.reduce((previous, current) => {
       return current || [];
-    }); //TODO: REMOVE TERN
+    });
     return Object.keys(details);
   }
 }
