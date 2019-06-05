@@ -6,9 +6,6 @@ class GetDataHelper {
   constructor() {}
 
   getByFilterOptions(searchTerm, filterByKey, parentSummary) {
-    console.log('searchTerm>>>', searchTerm)
-    console.log('filterByKey>>>', filterByKey)
-    console.log('parentFilter>>>', Object.keys(parentSummary))
     
     const finalResult = this.resultBasedOnFilter(searchTerm, filterByKey, Object.keys(parentSummary));
     return finalResult;
@@ -22,21 +19,43 @@ class GetDataHelper {
   }
 
   resultBasedOnFilter(searchTerm, filterByKey, parentSummary) {
-    console.log('parentSummary>>>', parentSummary)
       if(parentSummary.organisations) {
-        let response = this.allOrganisationDataResult(Organisations, searchTerm, filterByKey);
-        //TODO: get tickets and users related to organisation
+        const organisations = this.allOrganisationDataResult(Organisations, searchTerm, filterByKey);
+        const tickets = this.allOrganisationDataResult(Tickets, searchTerm, 'organization_id');
+        const users = this.allOrganisationDataResult(Users, searchTerm, 'organization_id');
+        const response = {organisation: organisations, tickets, users};
         return response;
       }
       if(parentSummary.tickets) {
-        let response = this.allOrganisationDataResult(Tickets, searchTerm, filterByKey);
+        const tickets = this.allOrganisationDataResult(Tickets, searchTerm, filterByKey);
+        const getOrganisationId = this.getAllInformation(tickets, 'organization_id');
+        const users = this.allOrganisationDataResult(Users, getOrganisationId, 'organization_id');
+        const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
+        const response = {ticket: organisations, tickets, users};
         return response;
       }
       if(parentSummary.users) {
-        let response = this.allOrganisationDataResult(Users ,searchTerm, filterByKey);
+        const users = this.allOrganisationDataResult(Users, searchTerm, filterByKey);
+        const getOrganisationId = this.getAllInformation(users, 'organization_id');
+        const tickets = this.allOrganisationDataResult(Tickets, getOrganisationId, 'organization_id');
+        const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
+        const response = {user: organisations, tickets, users};
         return response;
       }
 
+  }
+  getAllInformation(array, stringOfKeyWanted) {
+    let keyOfField = (array).reduce((previous, current) => {
+      if(current[stringOfKeyWanted] ) {
+        return current[stringOfKeyWanted] 
+      }
+      else {
+        return ""
+      }
+
+    }, {});
+    const keyFormatted = checkTypeOfItem(keyOfField);
+    return keyFormatted;
   }
   
   allOrganisationDataResult(jsonData, searchTerm, filterByKey) {
@@ -46,14 +65,16 @@ class GetDataHelper {
   }
 
   getDataBasedOnOrgId(array, searchTerm, idReference) {
-    let values = (array).map((k) => {      
-      let idIsString = checkTypeOfItem(k[idReference]);
-      let orgsWithId = checkValueIncludesTerm(idIsString, searchTerm, k);
-      return orgsWithId;
+    let values = (array).map((k) => {
+
+      let idIsString = checkTypeOfItem(k[idReference] || "");
+      if(idIsString) {
+        let orgsWithId = checkValueIncludesTerm(idIsString, searchTerm, k);
+        return orgsWithId;
+      }
     })
     let uniqueArray = values.filter((item, pos) => values.indexOf(item) == pos)
     const removingBadValues = (uniqueArray).filter((i) =>  i);
-    console.log('removingBadValues>>>', removingBadValues)
     return removingBadValues;
   }
 }
@@ -94,7 +115,7 @@ function checkTypeOfItem(value) {
   try {
     if (typeof value === "string") {
       return value;
-    } else if (typeof value === "object") {
+    } else if (typeof value === "object" && value.length > 0) {
       return arrayToObject(value);
     } else if (typeof value === "number") {
       return value.toString();
@@ -108,11 +129,18 @@ function checkTypeOfItem(value) {
 }
 
 function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
-  if (valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
-    return parentObject;
-  } 
+  try {
+    if (valueInArray && valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return parentObject;
+    } 
+  }
+  catch (Error) {
+    console.log("Error>>>", Error);
+    return "";
+  }
   // else {
-  //   console.log("in here>>>", valueInArray); //TODO MIGHT NEED TO ADD SOMETHING HERE
+  //   // console.log("in here>>>", valueInArray); //TODO MIGHT NEED TO ADD SOMETHING HERE
+  //   return "";
   // }
 }
 function arrayToObject(array) {
