@@ -13,45 +13,62 @@ class GetDataHelper {
     this.organisations = filterByValue(Organisations, searchTermValidated);
     this.tickets = filterByValue(Tickets, searchTermValidated);
     this.users = filterByValue(Users, searchTermValidated);
+    if(this.users.length == 0 && this.tickets == 0 && this.organisations == 0) {
+      return 'Nothing was found, please search again.';
+    }
     return {all_relating_information: [{organisations: this.organisations, tickets: this.tickets, users: this.users}]};
   }
 
-  // getAll(searchTerm) {
-  //   const searchTermValidated = checkTypeOfItem(searchTerm);
-  //   this.organisations = filterByValue(Organisations, searchTermValidated);
-  //   this.tickets = filterByValue(Tickets, searchTermValidated);
-  //   this.users = filterByValue(Users, searchTermValidated);
-  //   return {all_relating_information: [{organisations: this.organisations, tickets: this.tickets, users: this.users}]};
-  // }
   getByFilterOptions(searchTerm, filterByKey, parentSummary) {
     return this.resultBasedOnFilter(searchTerm, filterByKey, Object.keys(parentSummary));
   }
   resultBasedOnFilter(searchTerm, filterByKey, parentSummary) {
     const searchTermValidated = checkTypeOfItem(searchTerm);
     if (parentSummary && parentSummary.organisations) {
-      this.organisations = this.searchResultsByFilters(Organisations, searchTermValidated, filterByKey);
-      this.tickets = this.searchResultsByFilters(Tickets, searchTermValidated, 'organization_id');
-      this.users = this.searchResultsByFilters(Users, searchTermValidated, 'organization_id');
-      return {organisation: this.organisations, organisation_related_information: [{related_tickets: this.tickets, related_users: this.users}]};
+      return this.getOrganisationByFilters(searchTermValidated, filterByKey);
     }
     else if (parentSummary && parentSummary.tickets) {
-      this.tickets = this.searchResultsByFilters(Tickets, searchTermValidated, filterByKey);
-      const getOrganisationId = this.getAllInformation(this.tickets, 'organization_id');
-      this.users = this.searchResultsByFilters(Users, getOrganisationId, 'organization_id');
-      this.organisations = this.searchResultsByFilters(Organisations, getOrganisationId, '_id');
-      return {ticket: this.tickets, ticket_related_information: [{related_organisations: this.organisations, related_users: this.users}]};
+      return this.getTicketsByFilters(searchTermValidated, filterByKey);
     }
     else if (parentSummary && parentSummary.users) {
-      this.users = this.searchResultsByFilters(Users, searchTermValidated, filterByKey);
-      const getOrganisationId = this.getAllInformation(this.users, 'organization_id');
-      this.tickets = this.searchResultsByFilters(Tickets, getOrganisationId, 'organization_id');
-      this.organisations = this.searchResultsByFilters(Organisations, getOrganisationId, '_id');
-      return {user: this.users, ticket_related_information: [{related_organisations: this.organisations, related_users: this.tickets}]};
+      return this.getUsersByFilters(searchTermValidated, filterByKey);
     }
     else {
       return [];
     }
   }
+
+  getOrganisationByFilters(searchTermValidated, filterByKey) {
+    this.organisations = this.searchResultsByFilters(Organisations, searchTermValidated, filterByKey);
+    this.tickets = this.searchResultsByFilters(Tickets, searchTermValidated, 'organization_id');
+    this.users = this.searchResultsByFilters(Users, searchTermValidated, 'organization_id');
+    if(this.users.length == 0 && this.tickets == 0 && this.organisations == 0) {
+      return 'Nothing was found, please search again.';
+    }
+    return {organisation: this.organisations, organisation_related_information: [{related_tickets: this.tickets, related_users: this.users}]};
+  }
+  
+  getTicketsByFilters(searchTermValidated, filterByKey) {
+    this.tickets = this.searchResultsByFilters(Tickets, searchTermValidated, filterByKey);
+    const getOrganisationId = this.getAllInformation(this.tickets, 'organization_id');
+    this.users = this.searchResultsByFilters(Users, getOrganisationId, 'organization_id');
+    this.organisations = this.searchResultsByFilters(Organisations, getOrganisationId, '_id');
+    if(this.users.length == 0 && this.tickets == 0 && this.organisations == 0) {
+      return 'Nothing was found, please search again.';
+    }
+    return {ticket: this.tickets, ticket_related_information: [{related_organisations: this.organisations, related_users: this.users}]};
+  }
+  getUsersByFilters(searchTermValidated, filterByKey) {
+    this.users = this.searchResultsByFilters(Users, searchTermValidated, filterByKey);
+    const getOrganisationId = this.getAllInformation(this.users, 'organization_id');
+    this.tickets = this.searchResultsByFilters(Tickets, getOrganisationId, 'organization_id');
+    this.organisations = this.searchResultsByFilters(Organisations, getOrganisationId, '_id');
+    if(this.users.length == 0 && this.tickets == 0 && this.organisations == 0) {
+      return 'Nothing was found, please search again.';
+    }
+    return {user: this.users, ticket_related_information: [{related_organisations: this.organisations, related_users: this.tickets}]};
+  }
+
   getAllInformation(array, stringOfKeyWanted) {
     const keyOfField = array.reduce((previous, current) => {
       if (current[stringOfKeyWanted]) {
@@ -70,7 +87,6 @@ class GetDataHelper {
   }
   getResultsByKey(array, searchTerm, idReference) {
     const values = (array).map((k) => {
-
       const keyIsString = checkTypeOfItem(k[idReference] || "");
       if (keyIsString) {
         return checkValueIncludesTerm(keyIsString, searchTerm, k);
@@ -136,7 +152,7 @@ function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
       return parentObject;
     }
   } catch (Error) {
-    return "";
+    return "ERROR";
   }
 }
 function arrayToObject(array) {

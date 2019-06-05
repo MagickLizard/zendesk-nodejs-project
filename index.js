@@ -32,17 +32,14 @@ const askQuestions = () => {
         if (choice.toLowerCase().includes("all")) {
           return choice.toLowerCase();
         } else if (choice.toLowerCase().includes("organisation")) {
-          let topLevel = getUsersFiltersHelper.getAllFilters();
-          const organisations = {organisations: topLevel.organisations};
-          return organisations;
+          const organisationResults = getUsersFiltersHelper.getAllFilters();
+          return {organisations: organisationResults.organisations};
         } else if (choice.toLowerCase().includes("tickets")) {
-          let topLevel = getUsersFiltersHelper.getAllFilters();
-          const tickets = {tickets: topLevel.tickets};
-          return tickets;
+          const ticketResults = getUsersFiltersHelper.getAllFilters();
+          return {tickets: ticketResults.tickets};
         } else if (choice.toLowerCase().includes("users")) {
-          let topLevel = getUsersFiltersHelper.getAllFilters();
-          const users = {users: topLevel.users};
-          return users;
+          const userResults = getUsersFiltersHelper.getAllFilters();
+          return {users: userResults.users};
         }
         return choice.toLowerCase();
       }
@@ -72,17 +69,11 @@ const searchOnInput = (child_key, filters) => {
       message:
         "Please type into the command what you would like to search and press enter.",
       validate: function validateWord(word) {
-        console.log("Search term:", word);
         const expression = /^[A-Za-z0-9]+$/g;
         const regex = new RegExp(expression);
         if(word === ""){
-          console.log('word>>>', typeof word);
-          console.log('child_key>>>', child_key)
-          console.log('>filters>>', filters)
-        
           const getDataHelper = new GetDataHelper();
-
-          const results = getDataHelper.getItemsWithoutInput(word, child_key, filters);
+          const results = getDataHelper.getAll(word, child_key, filters);
           console.log(chalk.magenta(prettyjson.render(results)));
         }
         if(word.match(regex) !== null) {
