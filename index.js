@@ -3,8 +3,6 @@ const GetUsersFiltersHelper = require("./helpers/getUsersFiltersHelper");
 const chalk = require("chalk");
 const figlet = require("figlet");
 const inquirer = require("inquirer");
-const ora = require("ora");
-this.options = [""];
 
 const initalBanner = () => {
   console.log(
@@ -33,15 +31,15 @@ const askQuestions = () => {
         if (choice.toLowerCase().includes("all")) {
           return choice.toLowerCase();
         } else if (choice.toLowerCase().includes("organisation")) {
-          let topLevel = getUsersFiltersHelper.getAllFilters(choice);
+          let topLevel = getUsersFiltersHelper.getAllFilters();
           const organisations = {organisations: topLevel.organisations};
           return organisations;
         } else if (choice.toLowerCase().includes("tickets")) {
-          let topLevel = getUsersFiltersHelper.getAllFilters(choice);
+          let topLevel = getUsersFiltersHelper.getAllFilters();
           const tickets = {tickets: topLevel.tickets};
           return tickets;
         } else if (choice.toLowerCase().includes("users")) {
-          let topLevel = getUsersFiltersHelper.getAllFilters(choice);
+          let topLevel = getUsersFiltersHelper.getAllFilters();
           const users = {users: topLevel.users};
           return users;
         }
@@ -73,30 +71,29 @@ const searchOnInput = (child_key, filters) => {
       message:
         "Please type into the command what you would like to search and press enter.",
       validate: function validateWord(word) {
-        console.log("what is word>>", word);
+        console.log("Search term:", word);
+        const expression = /^[A-Za-z0-9]+$/g;
+        const regex = new RegExp(expression);
+        if(word.match(regex) !== null) {
+
         const getDataHelper = new GetDataHelper();
-        console.log('child_key>>>', child_key)
-        
+      
         if(child_key === 'all') {
           const results = getDataHelper.getAll(word, child_key, filters);
-          console.log(">GetDataHelper>>", results);
+
           return results;
         }
         else {
           const results = getDataHelper.resultBasedOnFilter(word, child_key, filters);
-          console.log(">GetDataHelper>>", results);
           return results;
         }
-
-
-        const expression = /^[A-Za-z]+$/g;
-        const regex = new RegExp(expression);
-        // setTimeout(() => {
-        //   const spinner = ora().start();
-        //   spinner.color = "yellow";
-        //   spinner.text = "Loading rainbows";
-        // }, 20);
-        return word.match(regex) !== null;
+      }
+        else {
+          return console.log(
+            chalk.magenta("A issue occured with this search.")
+          );
+        }
+    
       }
     }
   ];
@@ -130,6 +127,11 @@ const run = async () => {
     const answersSecond = await askQuestionSecond(filters.users);
     const {child_keys} = answersSecond;
     const searchBasedOnId = await searchOnInput(child_keys, filters);
+    setTimeout(() => {
+      const spinner = ora().start();
+      spinner.color = "yellow";
+      spinner.text = "Loading rainbows";
+    }, 20);
     return searchBasedOnId;
   }
   else {

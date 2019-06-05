@@ -3,18 +3,12 @@ const Tickets = require("../api/tickets.json");
 const Users = require("../api/users.json");
 
 class GetUsersFiltersHelper {
-  getAllFilters(filterByTerm) {
-    const finalResult = this.resultBasedOnFilter(filterByTerm);
-    console.log("finalResult>>>", finalResult);
-
-    return finalResult;
+  getAllFilters() {
+    return this.resultBasedOnFilter();
   }
-  resultBasedOnFilter(filterTerm) {
-    console.log("filterTerm>>>", filterTerm);
+  resultBasedOnFilter() {
 
-    if (filterTerm === "all") {
-      return ["all doesnt have any filters"];
-    }
+  
     const organisations = this.getAllKeys(Organisations);
     const users = this.getAllKeys(Users);
     const tickets = this.getAllKeys(Tickets);

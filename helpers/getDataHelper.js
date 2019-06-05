@@ -19,19 +19,20 @@ class GetDataHelper {
   }
 
   resultBasedOnFilter(searchTerm, filterByKey, parentSummary) {
+    const searchTermValidated = checkTypeOfItem(searchTerm);
       if(parentSummary.organisations) {
-        const organisations = this.allOrganisationDataResult(Organisations, searchTerm, filterByKey);
-        const tickets = this.allOrganisationDataResult(Tickets, searchTerm, 'organization_id');
-        const users = this.allOrganisationDataResult(Users, searchTerm, 'organization_id');
-        const response = {organisation: organisations, tickets, users};
+        const organisations = this.allOrganisationDataResult(Organisations, searchTermValidated, filterByKey);
+        const tickets = this.allOrganisationDataResult(Tickets, searchTermValidated, 'organization_id');
+        const users = this.allOrganisationDataResult(Users, searchTermValidated, 'organization_id');
+        const response = {organisation: organisations, organisation_related_information: tickets, users};
         return response;
       }
       if(parentSummary.tickets) {
-        const tickets = this.allOrganisationDataResult(Tickets, searchTerm, filterByKey);
+        const tickets = this.allOrganisationDataResult(Tickets, searchTermValidated, filterByKey);
         const getOrganisationId = this.getAllInformation(tickets, 'organization_id');
         const users = this.allOrganisationDataResult(Users, getOrganisationId, 'organization_id');
         const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
-        const response = {ticket: organisations, tickets, users};
+        const response = {ticket: tickets, ticket_related_information: organisations, users};
         return response;
       }
       if(parentSummary.users) {
@@ -39,28 +40,26 @@ class GetDataHelper {
         const getOrganisationId = this.getAllInformation(users, 'organization_id');
         const tickets = this.allOrganisationDataResult(Tickets, getOrganisationId, 'organization_id');
         const organisations = this.allOrganisationDataResult(Organisations, getOrganisationId, '_id');
-        const response = {user: organisations, tickets, users};
+        const response = {user: organisations, user_related_information: tickets, users};
         return response;
       }
-
   }
   getAllInformation(array, stringOfKeyWanted) {
     let keyOfField = (array).reduce((previous, current) => {
       if(current[stringOfKeyWanted] ) {
         return current[stringOfKeyWanted] 
       }
-      else {
-        return ""
-      }
 
     }, {});
-    const keyFormatted = checkTypeOfItem(keyOfField);
-    return keyFormatted;
+    if(keyOfField) {
+      const keyFormatted = checkTypeOfItem(keyOfField);
+      return keyFormatted;
+    }
+    return "";
   }
   
   allOrganisationDataResult(jsonData, searchTerm, filterByKey) {
     const anyResult = this.getDataBasedOnOrgId(jsonData, searchTerm, filterByKey);
-    console.log('anyResult>>>', anyResult);
     return anyResult;
   }
 
@@ -68,7 +67,7 @@ class GetDataHelper {
     let values = (array).map((k) => {
 
       let idIsString = checkTypeOfItem(k[idReference] || "");
-      if(idIsString) {
+      if (idIsString) {
         let orgsWithId = checkValueIncludesTerm(idIsString, searchTerm, k);
         return orgsWithId;
       }
@@ -123,25 +122,21 @@ function checkTypeOfItem(value) {
       return value;
     }
   } catch (Error) {
-    console.log("Error>>>", Error);
+    console.log("Error in type>>>", Error);
     return Error;
   }
 }
 
 function checkValueIncludesTerm(valueInArray, searchTerm, parentObject) {
   try {
-    if (valueInArray && valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
+    if (valueInArray.toLowerCase().includes(searchTerm.toLowerCase())) {
       return parentObject;
     } 
   }
   catch (Error) {
     console.log("Error>>>", Error);
-    return "";
+    return "Please search something more refined.";
   }
-  // else {
-  //   // console.log("in here>>>", valueInArray); //TODO MIGHT NEED TO ADD SOMETHING HERE
-  //   return "";
-  // }
 }
 function arrayToObject(array) {
   return Object.assign({}, array);
