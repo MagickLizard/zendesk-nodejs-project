@@ -27,6 +27,7 @@ Run CLI app
 Run test cases
 
 ``` yarn test ```
+
 Run eslint
 
 ``` yarn eslint . ```
