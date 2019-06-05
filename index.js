@@ -83,9 +83,11 @@ const searchOnInput = (child_key, filters) => {
                 chalk.magenta("  Nothing was found, please search again.")
               );
             } else {
+              console.log(("  "));
               console.log(chalk.magenta(prettyjson.render(results)));
             }
           } else {
+            console.log(("  "));
             const results = getDataHelper.resultBasedOnFilter(
               word,
               child_key,
