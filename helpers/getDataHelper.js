@@ -5,7 +5,7 @@ const Users = require("../api/users.json");
 class GetDataHelper {
   constructor() {}
 
-  getAll(searchTerm, filterByKey, parentSummary) {
+  getByFilterOptions(searchTerm, filterByKey, parentSummary) {
     console.log('searchTerm>>>', searchTerm)
     console.log('filterByKey>>>', filterByKey)
     console.log('parentFilter>>>', Object.keys(parentSummary))
@@ -18,13 +18,20 @@ class GetDataHelper {
     const finalResult = this.resultBasedOnFilter(organisationsResults, TicketsResults, UsersResults, searchTerm, filterByKey, Object.keys(parentSummary));
     return finalResult;
   }
+  getAll(searchTerm, filterByKey) {
+    console.log('searchTerm - getAll>>>', searchTerm)
+    console.log('filterByKey - getAll>>>', filterByKey)
+  
+    const organisations = filterByValue(Organisations, searchTerm);
+    const tickets = filterByValue(Tickets, searchTerm);
+    const users = filterByValue(Users, searchTerm);
+    return {organisations, tickets, users};
+
+  }
 
   resultBasedOnFilter(organisationsResults, TicketsResults, UsersResults, searchTerm, filterByKey, parentSummary) {
     let values = (parentSummary).map((k) => {
-      if (k === 'all') {
-        let arrayOfEverything = {organisationsResults, TicketsResults, UsersResults};
-        return arrayOfEverything;
-      }
+      console.log('k>>>', k)
       if(k === 'organisations') {
         let response = this.allOrganisationDataResult(organisationsResults, searchTerm, filterByKey);
         return response;

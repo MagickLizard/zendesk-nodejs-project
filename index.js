@@ -76,8 +76,17 @@ const searchOnInput = (child_key, filters) => {
       validate: function validateWord(word) {
         console.log("what is word>>", word);
         const getDataHelper = new GetDataHelper();
-        const results = getDataHelper.getAll(word, child_key, filters);
-        console.log(">GetDataHelper>>", results);
+        console.log('child_key>>>', child_key)
+        
+        if(child_key === 'all') {
+          const results = getDataHelper.getAll(word, child_key, filters);
+          console.log(">GetDataHelper>>", results);
+        }
+        else {
+          const results = getDataHelper.getAll(word, child_key, filters);
+          console.log(">GetDataHelper>>", results);
+        }
+
 
         const expression = /^[A-Za-z]+$/g;
         const regex = new RegExp(expression);
@@ -99,7 +108,7 @@ const run = async () => {
   const {filters} = answers;
   console.log(">filters>>", filters);
   if (filters == "all") {
-    const searchBasedOnId = await searchOnInput("all", filters);
+    const searchBasedOnId = await searchOnInput(filters, filters);
     return searchBasedOnId;
   }
   else if (filters.organisations) {
